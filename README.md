@@ -13,12 +13,10 @@ Once the user clicks on the link sent in SMS/Email, the login page refreshes its
 
 ```
 drop table if exists authorities;
-
-drop table if exists TWO_FACTOR_AUTH;
-
+drop table if exists two_factor_auth;
 drop table if exists users;
 
-create table users(
+create table users (
     username varchar_ignorecase(50) not null primary key,
     password varchar_ignorecase(500) not null,
     enabled boolean not null
@@ -30,19 +28,20 @@ create table authorities (
     constraint fk_authorities_users foreign key(username) references users(username)
 );
 
-CREATE TABLE TWO_FACTOR_AUTH(
-    ID BIGINT NOT NULL PRIMARY KEY,
-    AUTH_TOKEN VARCHAR(255),
-    DATE_CREATED DATE,
-    DATE_UPDATED DATE,
-    IS_VERIFIED BOOLEAN,
-    USERNAME VARCHAR(255),
+create table two_factor_auth (
+    id bigint not null primary key,
+    auth_token varchar(255),
+    date_created date,
+    date_updated date,
+    is_verified boolean,
+    username varchar(255),
     constraint fk_two_factor_auth_users foreign key(username) references users(username)
 );
 
 create unique index ix_auth_username on authorities (username,authority);
-
 create unique index ix_two_factor_auth_username on two_factor_auth (auth_token,username);
+
+create sequence hibernate_sequence;
 ```
 
 ### Insert a user:
