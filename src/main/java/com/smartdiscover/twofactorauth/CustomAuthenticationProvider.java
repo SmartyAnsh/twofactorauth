@@ -19,10 +19,13 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
     @Autowired
     private TwoFactorAuthRepo twoFactorAuthRepo;
 
+    @Autowired
+    private EmailServiceImpl emailService;
+
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 
-        String name = authentication.getName();
+        String name = authentication.getName(); //user email
         String password = authentication.getCredentials().toString();
         Authentication auth = super.authenticate(authentication);
 
@@ -33,6 +36,9 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
                     RequestContextHolder.currentRequestAttributes();
             HttpSession session = attr.getRequest().getSession(true);
             session.setAttribute("authToken", twoFactorAuth);
+
+            String text = "http://localhost:8080/twoFactorAuth/authenticate?user="+twoFactorAuth.getUsername()+"&token="+twoFactorAuth.getAuthToken();
+            emailService.sendSimpleMessage(name, "TwoFactorAuth Login Verification", text);
 
         }
         return auth;
